@@ -1,0 +1,180 @@
+{% load staticfiles %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Search Company</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <script
+    src="https://code.jquery.com/jquery-3.3.1.js"
+    integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+    crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet">
+    
+    
+     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    
+    
+    <!--For Plugins external css-->
+    <link rel="stylesheet" href="{% static "css/plugins.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/modal.css" %}"/>
+    <link rel="stylesheet" href="{% static "css/roboto-webfont.css" %}"/>
+    
+    <!--Theme custom css -->
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    
+   
+    <!--Theme custom css -->
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    
+
+    
+    <style>
+    .search-results{
+        position: absolute;
+        top: 40%;
+        left: -17%;
+    }
+    .search-results .result{
+        background: white;
+        padding: 1em;
+        border-bottom: 1px solid #f3f3f3;
+    }
+    .search-results .result .company-name{
+
+        margin-left: 1em;
+        margin-right: 1em;
+    }
+    .search-results .result .company-cin{
+        /* margin-left: 1em; */
+        color: silver;
+        margin-right: 1em;
+    }
+    .search-results .result .company-state{
+        /* margin-left: 1em; */
+        /* margin-right: 1em; */
+    }
+    .flex{
+        display: flex;
+    }
+</style>
+</head>
+<body>
+
+    <!--Home page style-->
+    <header id="home" class="home">
+        <div class="overlay-fluid-block">
+            <div class="container text-center">
+                <div class="row">
+                    <div class="home-wrapper">
+                        <div class="col-md-10 col-md-offset-1">
+                            <div class="home-content">
+
+                                <h1>Search here for over 40Lakh companies!</h1>
+                                <div class="row">
+                                    <div class="col-md-12 col-md-offset-2 col-sm-12 col-xs-12">
+                                        <div class="home-contact col-md-12">
+                                            <div class="input-group">
+                                                <!-- <form id="#target" method="GET"> -->
+                                                    <!-- {% csrf_token %} -->
+                                                    <input type="text" class="search-input form-control" name="s" placeholder="Enter company name or CIN">
+
+                                                    <!-- <input type="submit" class="form-control" value="Search"></a> -->
+                                                    <!-- </form> -->
+
+                                                </div><!-- /input-group -->
+
+                                            </div>
+                                            <div class="search-results col-md-12"></div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>          
+            </div><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+        </header>
+
+        <!-- <script src="{% static "js/search.js" %}"></script> -->
+        <script>
+            $(document).ready(function(){
+
+                var search = {
+                    listeners: function(){
+                        $('.search-input').keyup(function(){
+                            try{
+                                var searchTerm = $(this).val();
+                                var minCharacters = 3;
+
+                                    // Check if characters are more than minCharacters
+                                    if (searchTerm.length >= minCharacters){
+                                        search.read(searchTerm);
+                                    }
+                                    else{
+                                        $('.search-results').html(' ')
+                                    }
+                                }
+                                catch(ex){
+                                    console.log(ex);
+                                }
+                            });
+                    },
+                    read: function(searchTerm){
+                        try{
+                            var data = {'searchTerm': searchTerm};
+                            var url = "/SearchCompany/search"
+                            $.ajax({
+                                url: url,
+                                data: data,
+                                type: 'GET',
+                                success: function(response){
+                                    try{
+                                            // response = JSON.parse(response);
+                                            console.log("Response ", response);
+                                            if (response.length != 0){
+                                                // Now append search results
+                                                search.build(response);
+                                            }
+                                        }
+                                        catch(ex){
+                                            console.log(ex);
+                                        }
+                                    }
+                                });
+                        }
+                        catch(ex){
+                            console.log(ex);
+                        }
+                    },
+
+                    build: function(response){
+                        var data = response;
+                        var target = '.search-results';
+                        var appendable = "";
+
+                            // Clearing out the search result div first
+                            $(target).html('');
+                            
+                            for (x in data){
+                                appendable += '<a href="/SearchCompany/company?cin='+data[x].cin+'&state='+data[x].state+'"><div class="result flex col-md-12">'+
+                                '<div class="company-name col-md-6">'+data[x].name+'</div>'+
+                                '<div class="company-cin col-md-3">'+data[x].cin+'</div>'+
+                                '<div class="company-state col-md-3">'+data[x].state+'</div>'+
+                                '</div></a>';
+                            }
+                                // Append the results on screen
+                                $(target).append(appendable);
+                            },
+                        };
+                        
+                        search.listeners();
+                    });
+                </script>
+            </body>
+       
+       
